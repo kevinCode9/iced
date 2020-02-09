@@ -2,57 +2,54 @@ use crate::MouseCursor;
 
 use raw_window_handle::HasRawWindowHandle;
 
-/// A renderer that can target windows.
-pub trait Renderer: crate::Renderer + Sized {
-    /// The settings of the renderer.
+/// A graphics backend that can render to windows.
+pub trait Backend: Sized {
+    /// The settings of the backend.
     type Settings: Default;
 
-    /// The type of target.
-    type Target: Target<Renderer = Self>;
+    /// The iced renderer of the backend.
+    type Renderer: crate::Renderer;
 
-    /// Creates a new window [`Renderer`].
-    ///
-    /// [`Renderer`]: trait.Renderer.html
-    fn new(settings: Self::Settings) -> Self;
+    /// The surface of the backend.
+    type Surface;
 
-    /// Performs the drawing operations described in the output on the given
-    /// target.
+    /// The target of the backend.
+    type Target;
+
+    /// Creates a new [`Gpu`] and an associated iced renderer.
     ///
-    /// The overlay can be a bunch of debug text logs. It should be rendered on
-    /// top of the GUI on most scenarios.
+    /// [`Gpu`]: trait.Gpu.html
+    fn new(settings: Self::Settings) -> (Self, Self::Renderer);
+
+    /// Crates a new [`Surface`] for the given window.
+    ///
+    /// [`Surface`]: #associatedtype.Surface
+    fn create_surface<W: HasRawWindowHandle>(
+        &mut self,
+        window: &W,
+    ) -> Self::Surface;
+
+    /// Crates a new [`Target`] for the given [`Surface`].
+    ///
+    /// [`Target`]: #associatedtype.Target
+    /// [`Surface`]: #associatedtype.Surface
+    fn create_target(
+        &mut self,
+        surface: &Self::Surface,
+        width: u32,
+        height: u32,
+        scale_factor: f64,
+    ) -> Self::Target;
+
+    /// Draws the output primitives to the given [`Target`].
+    ///
+    /// [`Target`]: #associatedtype.Target
+    /// [`Surface`]: #associatedtype.Surface
     fn draw<T: AsRef<str>>(
         &mut self,
-        output: &Self::Output,
-        overlay: &[T],
+        renderer: &mut Self::Renderer,
         target: &mut Self::Target,
+        output: &<Self::Renderer as crate::Renderer>::Output,
+        overlay: &[T],
     ) -> MouseCursor;
-}
-
-/// A rendering target.
-pub trait Target {
-    /// The renderer of this target.
-    type Renderer;
-
-    /// Creates a new rendering [`Target`] from the given window handle, width,
-    /// height and dpi factor.
-    ///
-    /// [`Target`]: trait.Target.html
-    fn new<W: HasRawWindowHandle>(
-        window: &W,
-        width: u32,
-        height: u32,
-        scale_factor: f64,
-        renderer: &Self::Renderer,
-    ) -> Self;
-
-    /// Resizes the current [`Target`].
-    ///
-    /// [`Target`]: trait.Target.html
-    fn resize(
-        &mut self,
-        width: u32,
-        height: u32,
-        scale_factor: f64,
-        renderer: &Self::Renderer,
-    );
 }
