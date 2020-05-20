@@ -129,7 +129,6 @@ pub trait Application: Sized {
         use winit::{
             event::{self, WindowEvent},
             event_loop::{ControlFlow, EventLoop},
-            window::WindowBuilder,
         };
 
         let mut debug = Debug::new();
@@ -155,32 +154,11 @@ pub trait Application: Sized {
         let mut title = application.title();
         let mut mode = application.mode();
 
-        let window = {
-            let mut window_builder = WindowBuilder::new();
-
-            let (width, height) = settings.window.size;
-
-            window_builder = window_builder
-                .with_title(&title)
-                .with_inner_size(winit::dpi::LogicalSize { width, height })
-                .with_resizable(settings.window.resizable)
-                .with_decorations(settings.window.decorations)
-                .with_fullscreen(conversion::fullscreen(
-                    event_loop.primary_monitor(),
-                    mode,
-                ));
-
-            #[cfg(target_os = "windows")]
-            {
-                use winit::platform::windows::WindowBuilderExtWindows;
-
-                if let Some(parent) = settings.window.platform_specific.parent {
-                    window_builder = window_builder.with_parent_window(parent);
-                }
-            }
-
-            window_builder.build(&event_loop).expect("Open window")
-        };
+        let window = settings
+            .window
+            .into_builder(&title, mode, event_loop.primary_monitor())
+            .build(&event_loop)
+            .expect("Open window");
 
         let physical_size = window.inner_size();
         let mut viewport = Viewport::with_physical_size(
