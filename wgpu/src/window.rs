@@ -1,6 +1,4 @@
 //! Display rendering results on windows.
-mod backend;
-mod swap_chain;
+mod compositor;
 
-pub use backend::Backend;
-pub use swap_chain::SwapChain;
+pub use compositor::Compositor;
