@@ -273,8 +273,8 @@ where
     Message: 'a,
 {
     fn from(
-        column: Tooltip<'a, Message, Renderer>,
+        tooltip: Tooltip<'a, Message, Renderer>,
     ) -> Element<'a, Message, Renderer> {
-        Element::new(column)
+        Element::new(tooltip)
     }
 }
