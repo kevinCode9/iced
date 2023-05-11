@@ -1,27 +1,42 @@
 //! For creating a Gradient.
-pub mod linear;
-
 pub use linear::Linear;
 
-use crate::{Color, Point, Size};
+use crate::{Color, Radians};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 /// A fill which transitions colors progressively along a direction, either linearly, radially (TBD),
 /// or conically (TBD).
+///
+/// For a gradient which can be used as a fill on a canvas, see [`iced_graphics::Gradient`].
 pub enum Gradient {
-    /// A linear gradient interpolates colors along a direction from its `start` to its `end`
-    /// point.
+    /// A linear gradient interpolates colors along a direction at a specific [`Angle`].
     Linear(Linear),
 }
 
 impl Gradient {
     /// Creates a new linear [`linear::Builder`].
-    pub fn linear(position: impl Into<Position>) -> linear::Builder {
-        linear::Builder::new(position.into())
+    ///
+    /// This must be defined by an angle (in [`Degrees`] or [`Radians`])
+    /// which will use the bounds of the widget as a guide.
+    pub fn linear(angle: impl Into<Radians>) -> linear::Builder {
+        linear::Builder::new(angle.into())
+    }
+
+    /// Adjust the opacity of the gradient by a multiplier applied to each color stop.
+    pub fn mul_alpha(mut self, alpha_multiplier: f32) -> Self {
+        match &mut self {
+            Gradient::Linear(linear) => {
+                for stop in linear.color_stops.iter_mut().flatten() {
+                    stop.color.a *= alpha_multiplier;
+                }
+            }
+        }
+
+        self
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 /// A point along the gradient vector where the specified [`color`] is unmixed.
 ///
 /// [`color`]: Self::color
@@ -35,83 +50,84 @@ pub struct ColorStop {
     pub color: Color,
 }
 
-#[derive(Debug)]
-/// The position of the gradient within its bounds.
-pub enum Position {
-    /// The gradient will be positioned with respect to two points.
-    Absolute {
-        /// The starting point of the gradient.
-        start: Point,
-        /// The ending point of the gradient.
-        end: Point,
-    },
-    /// The gradient will be positioned relative to the provided bounds.
-    Relative {
-        /// The top left position of the bounds.
-        top_left: Point,
-        /// The width & height of the bounds.
-        size: Size,
-        /// The start [Location] of the gradient.
-        start: Location,
-        /// The end [Location] of the gradient.
-        end: Location,
-    },
-}
+pub mod linear {
+    //! Linear gradient builder & definition.
+    use crate::gradient::{ColorStop, Gradient};
+    use crate::{Color, Radians};
+    use std::cmp::Ordering;
 
-impl From<(Point, Point)> for Position {
-    fn from((start, end): (Point, Point)) -> Self {
-        Self::Absolute { start, end }
+    /// A linear gradient that can be used as a [`Background`].
+    #[derive(Debug, Clone, Copy, PartialEq)]
+    pub struct Linear {
+        /// How the [`Gradient`] is angled within its bounds.
+        pub angle: Radians,
+        /// [`ColorStop`]s along the linear gradient path.
+        pub color_stops: [Option<ColorStop>; 8],
     }
-}
 
-#[derive(Debug, Clone, Copy)]
-/// The location of a relatively-positioned gradient.
-pub enum Location {
-    /// Top left.
-    TopLeft,
-    /// Top.
-    Top,
-    /// Top right.
-    TopRight,
-    /// Right.
-    Right,
-    /// Bottom right.
-    BottomRight,
-    /// Bottom.
-    Bottom,
-    /// Bottom left.
-    BottomLeft,
-    /// Left.
-    Left,
-}
+    /// A [`Linear`] builder.
+    #[derive(Debug)]
+    pub struct Builder {
+        angle: Radians,
+        stops: [Option<ColorStop>; 8],
+    }
 
-impl Location {
-    fn to_absolute(self, top_left: Point, size: Size) -> Point {
-        match self {
-            Location::TopLeft => top_left,
-            Location::Top => {
-                Point::new(top_left.x + size.width / 2.0, top_left.y)
+    impl Builder {
+        /// Creates a new [`Builder`].
+        pub fn new(angle: Radians) -> Self {
+            Self {
+                angle,
+                stops: [None; 8],
             }
-            Location::TopRight => {
-                Point::new(top_left.x + size.width, top_left.y)
+        }
+
+        /// Adds a new [`ColorStop`], defined by an offset and a color, to the gradient.
+        ///
+        /// Any `offset` that is not within `0.0..=1.0` will be silently ignored.
+        ///
+        /// Any stop added after the 8th will be silently ignored.
+        pub fn add_stop(mut self, offset: f32, color: Color) -> Self {
+            if offset.is_finite() && (0.0..=1.0).contains(&offset) {
+                let (Ok(index) | Err(index)) =
+                    self.stops.binary_search_by(|stop| match stop {
+                        None => Ordering::Greater,
+                        Some(stop) => stop.offset.partial_cmp(&offset).unwrap(),
+                    });
+
+                if index < 8 {
+                    self.stops[index] = Some(ColorStop { offset, color });
+                }
+            } else {
+                log::warn!(
+                    "Gradient color stop must be within 0.0..=1.0 range."
+                );
+            };
+
+            self
+        }
+
+        /// Adds multiple [`ColorStop`]s to the gradient.
+        ///
+        /// Any stop added after the 8th will be silently ignored.
+        pub fn add_stops(
+            mut self,
+            stops: impl IntoIterator<Item = ColorStop>,
+        ) -> Self {
+            for stop in stops.into_iter() {
+                self = self.add_stop(stop.offset, stop.color)
             }
-            Location::Right => Point::new(
-                top_left.x + size.width,
-                top_left.y + size.height / 2.0,
-            ),
-            Location::BottomRight => {
-                Point::new(top_left.x + size.width, top_left.y + size.height)
-            }
-            Location::Bottom => Point::new(
-                top_left.x + size.width / 2.0,
-                top_left.y + size.height,
-            ),
-            Location::BottomLeft => {
-                Point::new(top_left.x, top_left.y + size.height)
-            }
-            Location::Left => {
-                Point::new(top_left.x, top_left.y + size.height / 2.0)
-            }
+
+            self
+        }
+
+        /// Builds the linear [`Gradient`] of this [`Builder`].
+        ///
+        /// Returns `BuilderError` if gradient in invalid.
+        pub fn build(self) -> Gradient {
+            Gradient::Linear(Linear {
+                angle: self.angle,
+                color_stops: self.stops,
+            })
         }
     }
 }
