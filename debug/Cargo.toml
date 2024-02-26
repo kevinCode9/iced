@@ -1,0 +1,23 @@
+[package]
+name = "iced_debug"
+description = "A pluggable API for debugging iced applications"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+categories.workspace = true
+keywords.workspace = true
+
+[features]
+enable = ["iced_sentinel", "once_cell"]
+
+[dependencies]
+iced_core.workspace = true
+
+iced_sentinel.workspace = true
+iced_sentinel.optional = true
+
+once_cell.workspace = true
+once_cell.optional = true
