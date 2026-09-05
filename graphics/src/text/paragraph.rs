@@ -345,27 +345,45 @@ impl core::text::Paragraph for Paragraph {
         let mut bounds = Vec::new();
         let mut current_bounds = None;
 
+        let mut y = 0.0;
+        let line_height = internal.buffer.metrics().line_height;
         let glyphs = internal
             .buffer
-            .layout_runs()
-            .flat_map(|run| {
-                let line_top = run.line_top;
-                let line_height = run.line_height;
-
-                run.glyphs
+            .lines
+            .iter()
+            .flat_map(|paragraph| {
+                paragraph
+                    .layout_opt()
+                    .map(Vec::as_slice)
+                    .unwrap_or_default()
                     .iter()
-                    .map(move |glyph| (line_top, line_height, glyph))
+                    .flat_map(move |line| {
+                        let glyph_height = line.max_ascent + line.max_descent;
+
+                        let glyphs = line.glyphs.iter().map(move |glyph| {
+                            (
+                                y + (line_height - glyph_height) / 2.0,
+                                y + glyph_height,
+                                glyph,
+                            )
+                        });
+
+                        let line_height = line.line_height_opt.unwrap_or(line_height);
+                        y += line_height;
+
+                        glyphs
+                    })
             })
             .skip_while(|(_, _, glyph)| glyph.metadata != index)
             .take_while(|(_, _, glyph)| glyph.metadata == index);
 
-        for (line_top, line_height, glyph) in glyphs {
-            let y = line_top + glyph.y;
+        for (line_top, line_bottom, glyph) in glyphs {
+            let y = line_top;
 
             let new_bounds = || {
                 Rectangle::new(
-                    Point::new(glyph.x, y),
-                    Size::new(glyph.w, glyph.line_height_opt.unwrap_or(line_height)),
+                    Point::new(glyph.x, line_top),
+                    Size::new(glyph.w, line_bottom - line_top),
                 ) * (1.0 / self.0.hint_factor)
             };
 
