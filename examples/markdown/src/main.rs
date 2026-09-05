@@ -2,6 +2,7 @@ mod icon;
 
 use iced::animation;
 use iced::clipboard;
+use iced::padding;
 use iced::time::{self, Instant, milliseconds};
 use iced::widget::{
     button, center_x, container, hover, image, markdown, operation, pick_list, right, row,
@@ -174,17 +175,19 @@ impl Markdown {
     }
 
     fn view(&self) -> Element<'_, Message> {
+        let settings = markdown::Settings::default().line_height(1.5);
+
         let editor = text_editor(&self.raw)
             .placeholder("Type your Markdown here...")
             .on_action(Message::Edit)
             .height(Fill)
-            .padding(10)
+            .padding(settings.spacing)
             .font(Font::MONOSPACE)
             .highlight("markdown");
 
         let preview = markdown::view_with(
             self.content.items(),
-            markdown::Settings::default(),
+            settings,
             &CustomViewer {
                 theme: &self.theme,
                 images: &self.images,
@@ -196,7 +199,7 @@ impl Markdown {
             editor,
             hover(
                 scrollable(preview)
-                    .spacing(10)
+                    .spacing(settings.spacing)
                     .width(Fill)
                     .height(Fill)
                     .id("preview"),
@@ -211,11 +214,11 @@ impl Markdown {
                     .spacing(10)
                     .align_y(Center)
                 )
-                .padding([0, 20])
+                .padding(padding::right(settings.spacing + 10.0))
             )
         ]
-        .spacing(10)
-        .padding(10)
+        .spacing(settings.spacing)
+        .padding(settings.spacing / 2.0)
         .into()
     }
 

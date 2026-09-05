@@ -45,8 +45,8 @@ use crate::core::theme;
 use crate::core::widget::{self, Widget};
 use crate::core::window;
 use crate::core::{
-    Background, Border, Code, Color, Element, Event, Length, Padding, Pixels, Rectangle, Shell,
-    Size, Theme,
+    Background, Border, Color, Element, Event, Length, Padding, Pixels, Rectangle, Shell, Size,
+    Theme,
 };
 
 use std::borrow::Cow;
@@ -181,7 +181,7 @@ where
             iced_highlighter::Settings {
                 token: syntax.to_owned(),
             },
-            Code::highlight,
+            crate::core::Code::highlight,
         )
     }
 }
