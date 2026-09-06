@@ -40,7 +40,6 @@ impl Renderer for () {
 }
 
 impl text::Renderer for () {
-    type Font = Font;
     type Paragraph = ();
     type Editor = ();
 
@@ -52,14 +51,6 @@ impl text::Renderer for () {
     const SCROLL_LEFT_ICON: char = '0';
     const SCROLL_RIGHT_ICON: char = '0';
     const ICED_LOGO: char = '0';
-
-    fn default_font(&self) -> Self::Font {
-        Font::default()
-    }
-
-    fn default_size(&self) -> Pixels {
-        Pixels(16.0)
-    }
 
     fn fill_paragraph(
         &mut self,
@@ -90,11 +81,9 @@ impl text::Renderer for () {
 }
 
 impl text::Paragraph for () {
-    type Font = Font;
-
     fn with_text(_text: Text<&str>) -> Self {}
 
-    fn with_spans<Link>(_text: Text<&[text::Span<'_, Link, Self::Font>], Self::Font>) -> Self {}
+    fn with_spans<Link>(_text: Text<&[text::Span<'_, Link>]>) -> Self {}
 
     fn resize(&mut self, _new_bounds: Size) {}
 
@@ -160,8 +149,6 @@ impl text::Paragraph for () {
 }
 
 impl text::Editor for () {
-    type Font = Font;
-
     fn with_text(_text: &str) -> Self {}
 
     fn is_empty(&self) -> bool {
@@ -210,7 +197,7 @@ impl text::Editor for () {
     fn update(
         &mut self,
         _new_bounds: Size,
-        _new_font: Self::Font,
+        _new_font: Font,
         _new_size: Pixels,
         _new_line_height: text::LineHeight,
         _new_wrapping: text::Wrapping,
@@ -224,7 +211,7 @@ impl text::Editor for () {
 
     fn highlight<P: text::Parser>(
         &mut self,
-        _font: Self::Font,
+        _font: Font,
         _parser: &mut P,
         _highlighter: impl Fn(P::Output) -> highlighter::Style,
     ) {
@@ -238,8 +225,8 @@ impl text::Editor for () {
         text::LineHeight::default()
     }
 
-    fn font(&self) -> Self::Font {
-        Self::Font::default()
+    fn font(&self) -> Font {
+        Font::default()
     }
 }
 

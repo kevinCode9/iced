@@ -31,6 +31,8 @@
 //! }
 //! ```
 //! ![Checkbox drawn by `iced_wgpu`](https://github.com/iced-rs/iced/blob/7760618fb112074bc40b148944521f312152012a/docs/images/checkbox.png?raw=true)
+use std::marker::PhantomData;
+
 use crate::core::alignment;
 use crate::core::layout;
 use crate::core::mouse;
@@ -42,8 +44,8 @@ use crate::core::widget;
 use crate::core::widget::tree::{self, Tree};
 use crate::core::window;
 use crate::core::{
-    Background, Border, Color, Element, Event, Layout, Length, Pixels, Rectangle, Shell, Size,
-    Theme, Widget,
+    Background, Border, Color, Element, Event, Font, Layout, Length, Pixels, Rectangle, Shell,
+    Size, Theme, Widget,
 };
 
 /// A box that can be checked.
@@ -81,8 +83,8 @@ use crate::core::{
 /// ![Checkbox drawn by `iced_wgpu`](https://github.com/iced-rs/iced/blob/7760618fb112074bc40b148944521f312152012a/docs/images/checkbox.png?raw=true)
 pub struct Checkbox<'a, Message, Theme = crate::Theme, Renderer = crate::Renderer>
 where
-    Renderer: text::Renderer,
     Theme: Catalog,
+    Renderer: text::Renderer,
 {
     is_checked: bool,
     on_toggle: Option<Box<dyn Fn(bool) -> Message + 'a>>,
@@ -94,10 +96,11 @@ where
     line_height: text::LineHeight,
     shaping: text::Shaping,
     wrapping: text::Wrapping,
-    font: Option<Renderer::Font>,
-    icon: Icon<Renderer::Font>,
+    font: Option<Font>,
+    icon: Icon,
     class: Theme::Class<'a>,
     last_status: Option<Status>,
+    renderer_: PhantomData<Renderer>,
 }
 
 impl<'a, Message, Theme, Renderer> Checkbox<'a, Message, Theme, Renderer>
@@ -134,6 +137,7 @@ where
             },
             class: Theme::default(),
             last_status: None,
+            renderer_: PhantomData,
         }
     }
 
@@ -210,16 +214,16 @@ where
         self
     }
 
-    /// Sets the [`Renderer::Font`] of the text of the [`Checkbox`].
+    /// Sets the [`Font`] of the text of the [`Checkbox`].
     ///
-    /// [`Renderer::Font`]: crate::core::text::Renderer
-    pub fn font(mut self, font: impl Into<Renderer::Font>) -> Self {
+    /// [`Font`]: crate::core::Font
+    pub fn font(mut self, font: impl Into<Font>) -> Self {
         self.font = Some(font.into());
         self
     }
 
     /// Sets the [`Icon`] of the [`Checkbox`].
-    pub fn icon(mut self, icon: Icon<Renderer::Font>) -> Self {
+    pub fn icon(mut self, icon: Icon) -> Self {
         self.icon = icon;
         self
     }
@@ -484,7 +488,7 @@ where
 
 /// The icon in a [`Checkbox`].
 #[derive(Debug, Clone, PartialEq)]
-pub struct Icon<Font> {
+pub struct Icon {
     /// Font that will be used to display the `code_point`,
     pub font: Font,
     /// The unicode code point that will be used as the icon.

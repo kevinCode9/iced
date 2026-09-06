@@ -5,7 +5,7 @@ const ICON_FONT: Font = Font::new("icons");
 
 pub fn main() -> iced::Result {
     iced::application(Example::default, Example::update, Example::view)
-        .font(include_bytes!("../fonts/icons.ttf").as_slice())
+        .fonts([include_bytes!("../fonts/icons.ttf").as_slice()])
         .run()
 }
 

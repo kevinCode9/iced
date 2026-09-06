@@ -14,7 +14,7 @@ use crate::core::renderer;
 use crate::core::text;
 use crate::core::theme;
 use crate::core::window;
-use crate::core::{Element, Font, Settings};
+use crate::core::{Element, Settings};
 use crate::futures::{Executor, Subscription};
 use crate::graphics::compositor;
 use crate::runtime::Task;
@@ -551,12 +551,9 @@ pub fn with_executor<P: Program, E: Executor>(
 }
 
 /// The renderer of some [`Program`].
-pub trait Renderer: text::Renderer<Font = Font> + compositor::Default + renderer::Headless {}
+pub trait Renderer: text::Renderer + compositor::Default + renderer::Headless {}
 
-impl<T> Renderer for T where
-    T: text::Renderer<Font = Font> + compositor::Default + renderer::Headless
-{
-}
+impl<T> Renderer for T where T: text::Renderer + compositor::Default + renderer::Headless {}
 
 /// A particular instance of a running [`Program`].
 pub struct Instance<P: Program> {

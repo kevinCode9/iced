@@ -1161,7 +1161,7 @@ pub fn view<'a, Theme, Renderer>(
 ) -> Element<'a, Uri, Theme, Renderer>
 where
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     view_with(
         items,
@@ -1186,7 +1186,7 @@ pub fn view_with<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     self::items(viewer, settings.into(), items)
 }
@@ -1200,7 +1200,7 @@ pub fn item<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     match item {
         Item::Image { url, title, alt } => viewer.image(settings, url, title, alt),
@@ -1236,7 +1236,7 @@ pub fn heading<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     let Settings {
         h1_size,
@@ -1284,7 +1284,7 @@ pub fn paragraph<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     rich_text(text.spans(settings, viewer.theme(), viewer.highlighter()))
         .size(settings.text_size)
@@ -1303,7 +1303,7 @@ pub fn unordered_list<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     column(bullets.iter().map(|bullet| {
         row![
@@ -1346,7 +1346,7 @@ pub fn ordered_list<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     let digits = (start + bullets.len() as u64).max(1).ilog10() + 1;
 
@@ -1382,7 +1382,7 @@ pub fn code_block<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     container(
         scrollable(column(lines.iter().map(|line| {
@@ -1415,7 +1415,7 @@ pub fn quote<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     container(
         column(
@@ -1436,7 +1436,7 @@ pub fn rule<'a, Message, Theme, Renderer>() -> Element<'a, Message, Theme, Rende
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     rule::horizontal(2).into()
 }
@@ -1451,7 +1451,7 @@ pub fn table<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     use crate::table;
 
@@ -1495,7 +1495,7 @@ pub fn items<'a, Message, Theme, Renderer>(
 where
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     column(sections(items).map(|(heading, contents)| {
         let contents = column(
@@ -1527,7 +1527,7 @@ where
     Self: Sized + 'a,
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     /// The [`Theme`] used for styling the Markdown elements.
     fn theme(&self) -> &Theme;
@@ -1674,7 +1674,7 @@ impl<'a, Theme> DefaultViewer<'a, Theme> {
 impl<'a, Theme, Renderer> Viewer<'a, Uri, Theme, Renderer> for DefaultViewer<'a, Theme>
 where
     Theme: Catalog + 'a,
-    Renderer: core::text::Renderer<Font = Font> + 'a,
+    Renderer: core::text::Renderer + 'a,
 {
     fn theme(&self) -> &Theme {
         &self.theme

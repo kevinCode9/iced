@@ -73,8 +73,8 @@ use crate::core::touch;
 use crate::core::widget::tree::{self, Tree};
 use crate::core::window;
 use crate::core::{
-    Background, Border, Color, Element, Event, Layout, Length, Padding, Pixels, Point, Rectangle,
-    Shell, Size, Theme, Vector, Widget,
+    Background, Border, Color, Element, Event, Font, Layout, Length, Padding, Pixels, Point,
+    Rectangle, Shell, Size, Theme, Vector, Widget,
 };
 use crate::overlay::menu::{self, Menu};
 
@@ -144,13 +144,12 @@ use std::f32;
 ///     }
 /// }
 /// ```
-pub struct PickList<'a, T, L, V, Message, Theme = crate::Theme, Renderer = crate::Renderer>
+pub struct PickList<'a, T, L, V, Message, Theme = crate::Theme>
 where
     T: PartialEq + Clone,
     L: Borrow<[T]> + 'a,
     V: Borrow<T> + 'a,
     Theme: Catalog,
-    Renderer: text::Renderer,
 {
     options: L,
     to_string: Box<dyn Fn(&T) -> String + 'a>,
@@ -165,22 +164,21 @@ where
     line_height: text::LineHeight,
     shaping: text::Shaping,
     ellipsis: text::Ellipsis,
-    font: Option<Renderer::Font>,
-    handle: Handle<Renderer::Font>,
+    font: Option<Font>,
+    handle: Handle,
     class: <Theme as Catalog>::Class<'a>,
     menu_class: <Theme as menu::Catalog>::Class<'a>,
     last_status: Option<Status>,
     menu_height: Length,
 }
 
-impl<'a, T, L, V, Message, Theme, Renderer> PickList<'a, T, L, V, Message, Theme, Renderer>
+impl<'a, T, L, V, Message, Theme> PickList<'a, T, L, V, Message, Theme>
 where
     T: PartialEq + Clone,
     L: Borrow<[T]> + 'a,
     V: Borrow<T> + 'a,
     Message: Clone,
     Theme: Catalog,
-    Renderer: text::Renderer,
 {
     /// Creates a new [`PickList`] with the given list of options, the current
     /// selected value, and the message to produce when an option is selected.
@@ -257,13 +255,13 @@ where
     }
 
     /// Sets the font of the [`PickList`].
-    pub fn font(mut self, font: impl Into<Renderer::Font>) -> Self {
+    pub fn font(mut self, font: impl Into<Font>) -> Self {
         self.font = Some(font.into());
         self
     }
 
     /// Sets the [`Handle`] of the [`PickList`].
-    pub fn handle(mut self, handle: Handle<Renderer::Font>) -> Self {
+    pub fn handle(mut self, handle: Handle) -> Self {
         self.handle = handle;
         self
     }
@@ -324,7 +322,7 @@ where
 }
 
 impl<'a, T, L, V, Message, Theme, Renderer> Widget<Message, Theme, Renderer>
-    for PickList<'a, T, L, V, Message, Theme, Renderer>
+    for PickList<'a, T, L, V, Message, Theme>
 where
     T: Clone + PartialEq + 'a,
     L: Borrow<[T]>,
@@ -356,8 +354,8 @@ where
     ) -> layout::Node {
         let state = tree.state.downcast_mut::<State<Renderer::Paragraph>>();
 
-        let font = self.font.unwrap_or_else(|| renderer.default_font());
-        let text_size = self.text_size.unwrap_or_else(|| renderer.default_size());
+        let font = self.font.unwrap_or_else(|| renderer.font());
+        let text_size = self.text_size.unwrap_or_else(|| renderer.text_size());
         let options = self.options.borrow();
 
         let option_text = Text {
@@ -577,7 +575,7 @@ where
         _cursor: mouse::Cursor,
         viewport: &Rectangle,
     ) {
-        let font = self.font.unwrap_or_else(|| renderer.default_font());
+        let font = self.font.unwrap_or_else(|| renderer.font());
         let selected = self.selected.as_ref().map(Borrow::borrow);
         let state = tree.state.downcast_ref::<State<Renderer::Paragraph>>();
 
@@ -636,7 +634,7 @@ where
         };
 
         if let Some((font, code_point, size, line_height, shaping)) = handle {
-            let size = size.unwrap_or_else(|| renderer.default_size());
+            let size = size.unwrap_or_else(|| renderer.text_size());
 
             renderer.fill_text(
                 Text {
@@ -664,7 +662,7 @@ where
         let label = selected.map(&self.to_string);
 
         if let Some(label) = label.or_else(|| self.placeholder.clone()) {
-            let text_size = self.text_size.unwrap_or_else(|| renderer.default_size());
+            let text_size = self.text_size.unwrap_or_else(|| renderer.text_size());
 
             renderer.fill_text(
                 Text {
@@ -707,7 +705,7 @@ where
         };
 
         let state = tree.state.downcast_mut::<State<Renderer::Paragraph>>();
-        let font = self.font.unwrap_or_else(|| renderer.default_font());
+        let font = self.font.unwrap_or_else(|| renderer.font());
 
         if state.is_open {
             let bounds = layout.bounds();
@@ -747,7 +745,7 @@ where
     }
 }
 
-impl<'a, T, L, V, Message, Theme, Renderer> From<PickList<'a, T, L, V, Message, Theme, Renderer>>
+impl<'a, T, L, V, Message, Theme, Renderer> From<PickList<'a, T, L, V, Message, Theme>>
     for Element<'a, Message, Theme, Renderer>
 where
     T: Clone + PartialEq + 'a,
@@ -757,7 +755,7 @@ where
     Theme: Catalog + 'a,
     Renderer: text::Renderer + 'a,
 {
-    fn from(pick_list: PickList<'a, T, L, V, Message, Theme, Renderer>) -> Self {
+    fn from(pick_list: PickList<'a, T, L, V, Message, Theme>) -> Self {
         Self::new(pick_list)
     }
 }
@@ -794,7 +792,7 @@ impl<P: text::Paragraph> Default for State<P> {
 
 /// The handle to the right side of the [`PickList`].
 #[derive(Debug, Clone, PartialEq)]
-pub enum Handle<Font> {
+pub enum Handle {
     /// Displays an arrow icon (▼).
     ///
     /// This is the default.
@@ -803,19 +801,19 @@ pub enum Handle<Font> {
         size: Option<Pixels>,
     },
     /// A custom static handle.
-    Static(Icon<Font>),
+    Static(Icon),
     /// A custom dynamic handle.
     Dynamic {
         /// The [`Icon`] used when [`PickList`] is closed.
-        closed: Icon<Font>,
+        closed: Icon,
         /// The [`Icon`] used when [`PickList`] is open.
-        open: Icon<Font>,
+        open: Icon,
     },
     /// No handle will be shown.
     None,
 }
 
-impl<Font> Default for Handle<Font> {
+impl Default for Handle {
     fn default() -> Self {
         Self::Arrow { size: None }
     }
@@ -823,7 +821,7 @@ impl<Font> Default for Handle<Font> {
 
 /// The icon of a [`Handle`].
 #[derive(Debug, Clone, PartialEq)]
-pub struct Icon<Font> {
+pub struct Icon {
     /// Font that will be used to display the `code_point`,
     pub font: Font,
     /// The unicode code point that will be used as the icon.

@@ -27,5 +27,4 @@ pub use rich::Rich;
 ///         .into()
 /// }
 /// ```
-pub type Text<'a, Theme = crate::Theme, Renderer = crate::Renderer> =
-    crate::core::widget::Text<'a, Theme, Renderer>;
+pub type Text<'a, Theme = crate::Theme> = crate::core::widget::Text<'a, Theme>;

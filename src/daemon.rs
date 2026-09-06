@@ -166,7 +166,7 @@ impl<P: Program> Daemon<P> {
     pub fn default_font(self, default_font: Font) -> Self {
         Self {
             settings: Settings {
-                default_font,
+                font: default_font,
                 ..self.settings
             },
             ..self

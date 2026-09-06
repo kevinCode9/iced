@@ -165,12 +165,12 @@ pub trait Headless {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Settings {
     /// The default [`Font`] to use.
-    pub default_font: Font,
+    pub font: Font,
 
     /// The default size of text.
     ///
     /// By default, it will be set to `16.0`.
-    pub default_text_size: Pixels,
+    pub text_size: Pixels,
 
     /// Whether the [`Renderer`] should perform metrics hinting.
     ///
@@ -181,8 +181,8 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            default_font: Font::DEFAULT,
-            default_text_size: Pixels(16.0),
+            font: Font::DEFAULT,
+            text_size: Pixels(16.0),
             metrics_hinting: true,
         }
     }

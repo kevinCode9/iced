@@ -60,7 +60,7 @@ pub use primitive::Primitive;
 pub use geometry::Geometry;
 
 use crate::core::renderer;
-use crate::core::{Background, Color, Font, Pixels, Point, Rectangle, Size, Transformation};
+use crate::core::{Background, Color, Font, Point, Rectangle, Size, Transformation};
 use crate::graphics::mesh;
 use crate::graphics::text::{Editor, Paragraph};
 use crate::graphics::{Shell, Viewport};
@@ -723,7 +723,6 @@ impl core::Renderer for Renderer {
 }
 
 impl core::text::Renderer for Renderer {
-    type Font = Font;
     type Paragraph = Paragraph;
     type Editor = Editor;
 
@@ -735,14 +734,6 @@ impl core::text::Renderer for Renderer {
     const SCROLL_DOWN_ICON: char = '\u{e803}';
     const SCROLL_LEFT_ICON: char = '\u{e804}';
     const SCROLL_RIGHT_ICON: char = '\u{e805}';
-
-    fn default_font(&self) -> Self::Font {
-        self.settings.default_font
-    }
-
-    fn default_size(&self) -> Pixels {
-        self.settings.default_text_size
-    }
 
     fn fill_paragraph(
         &mut self,
