@@ -316,7 +316,7 @@ where
                     let size = span
                         .size
                         .or(self.size)
-                        .unwrap_or(renderer.settings().default_text_size);
+                        .unwrap_or(renderer.settings().text_size);
 
                     let line_height = span
                         .line_height
@@ -484,8 +484,8 @@ where
     layout::sized(limits, width, height, |limits| {
         let bounds = limits.max();
 
-        let size = size.unwrap_or_else(|| renderer.settings().default_text_size);
-        let font = font.unwrap_or_else(|| renderer.settings().default_font);
+        let size = size.unwrap_or_else(|| renderer.settings().text_size);
+        let font = font.unwrap_or_else(|| renderer.settings().font);
 
         let text_with_spans = || core::Text {
             content: spans,

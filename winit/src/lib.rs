@@ -1669,8 +1669,8 @@ fn run_action<'a, P, C>(
                 }
             }
             font::Action::SetDefaults { font, text_size } => {
-                renderer_settings.default_font = font;
-                renderer_settings.default_text_size = text_size;
+                renderer_settings.font = font;
+                renderer_settings.text_size = text_size;
 
                 let Some(compositor) = compositor else {
                     return;

@@ -20,12 +20,12 @@ pub struct Settings {
     /// The default [`Font`] to be used.
     ///
     /// By default, it uses [`Family::SansSerif`](crate::font::Family::SansSerif).
-    pub default_font: Font,
+    pub font: Font,
 
     /// The text size that will be used by default.
     ///
     /// By default, it is `16.0`.
-    pub default_text_size: Pixels,
+    pub text_size: Pixels,
 
     /// Whether certain widgets should be rendered using metrics hinting.
     ///
@@ -69,8 +69,8 @@ impl Default for Settings {
         Self {
             id: None,
             fonts: Vec::new(),
-            default_font: renderer.default_font,
-            default_text_size: renderer.default_text_size,
+            font: renderer.font,
+            text_size: renderer.text_size,
             metrics_hinting: true,
             backend: Backend::default(),
             power_preference: backend::PowerPreference::None,
@@ -83,8 +83,8 @@ impl Default for Settings {
 impl From<&Settings> for renderer::Settings {
     fn from(settings: &Settings) -> Self {
         Self {
-            default_font: settings.default_font,
-            default_text_size: settings.default_text_size,
+            font: settings.font,
+            text_size: settings.text_size,
             metrics_hinting: settings.metrics_hinting,
         }
     }

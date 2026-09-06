@@ -307,10 +307,10 @@ where
 
         let size = format
             .size
-            .unwrap_or_else(|| renderer.settings().default_text_size);
+            .unwrap_or_else(|| renderer.settings().text_size);
         let font = format
             .font
-            .unwrap_or_else(|| renderer.settings().default_font);
+            .unwrap_or_else(|| renderer.settings().font);
 
         let _ = paragraph.update(text::Text {
             content,

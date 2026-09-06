@@ -228,19 +228,22 @@ impl<P: Program> Application<P> {
     }
 
     /// Sets the default [`Font`] of the [`Application`].
-    pub fn default_font(self, default_font: Font) -> Self {
+    pub fn font(self, default_font: Font) -> Self {
         Self {
             settings: Settings {
-                default_font,
+                font: default_font,
                 ..self.settings
             },
             ..self
         }
     }
 
-    /// Adds a font to the list of fonts that will be loaded at the start of the [`Application`].
-    pub fn font(mut self, font: impl Into<Cow<'static, [u8]>>) -> Self {
-        self.settings.fonts.push(font.into());
+    /// Adds a set of fonts to the list of fonts that will be loaded at the start of the [`Application`].
+    pub fn fonts(mut self, fonts: impl IntoIterator<Item = impl Into<Cow<'static, [u8]>>>) -> Self {
+        self.settings
+            .fonts
+            .extend(fonts.into_iter().map(Into::into));
+
         self
     }
 

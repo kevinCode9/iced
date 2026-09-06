@@ -22,7 +22,7 @@ pub fn main() -> iced::Result {
         Markdown::subscription,
         Markdown::view,
     )
-    .font(icon::FONT)
+    .fonts([icon::FONT])
     .theme(Markdown::theme)
     .run()
 }

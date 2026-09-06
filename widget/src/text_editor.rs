@@ -367,10 +367,9 @@ where
 
         internal.editor.update(
             limits.shrink(self.padding).max(),
-            self.font
-                .unwrap_or_else(|| renderer.settings().default_font),
+            self.font.unwrap_or_else(|| renderer.settings().font),
             self.text_size
-                .unwrap_or_else(|| renderer.settings().default_text_size),
+                .unwrap_or_else(|| renderer.settings().text_size),
             self.line_height,
             self.wrapping,
             text::Alignment::Default,
@@ -513,9 +512,7 @@ where
         let mut internal = self.content.0.borrow_mut();
         let state = tree.state.downcast_ref::<State<Parser>>();
 
-        let font = self
-            .font
-            .unwrap_or_else(|| renderer.settings().default_font);
+        let font = self.font.unwrap_or_else(|| renderer.settings().font);
 
         let theme_name = theme.name();
 
@@ -561,7 +558,7 @@ where
                     bounds: text_bounds.size(),
                     size: self
                         .text_size
-                        .unwrap_or_else(|| renderer.settings().default_text_size),
+                        .unwrap_or_else(|| renderer.settings().text_size),
                     line_height: self.line_height,
                     font,
                     align_x: text::Alignment::Default,

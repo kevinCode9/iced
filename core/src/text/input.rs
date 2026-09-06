@@ -86,10 +86,10 @@ impl<R: text::Renderer> Input<R> {
 
         let font = layout
             .font
-            .unwrap_or_else(|| renderer.settings().default_font);
+            .unwrap_or_else(|| renderer.settings().font);
         let size = layout
             .size
-            .unwrap_or_else(|| renderer.settings().default_text_size);
+            .unwrap_or_else(|| renderer.settings().text_size);
         let hint_factor = renderer.hint_factor();
 
         if layout.is_secure {
