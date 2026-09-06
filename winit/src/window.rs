@@ -362,11 +362,9 @@ where
             self.content = Renderer::Paragraph::with_spans(Text {
                 content: &spans,
                 bounds: Size::INFINITE,
-                size: preedit
-                    .text_size
-                    .unwrap_or_else(|| renderer.settings().text_size),
+                size: preedit.text_size.unwrap_or_else(|| renderer.text_size()),
                 line_height: text::LineHeight::default(),
-                font: renderer.settings().font,
+                font: renderer.font(),
                 align_x: text::Alignment::Default,
                 align_y: alignment::Vertical::Top,
                 shaping: text::Shaping::Advanced,

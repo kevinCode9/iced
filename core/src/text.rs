@@ -361,6 +361,16 @@ pub trait Renderer: crate::Renderer {
     /// ['ICON_FONT']: Self::ICON_FONT
     const ICED_LOGO: char;
 
+    /// Returns the default [`Font`].
+    fn font(&self) -> Font {
+        self.settings().font
+    }
+
+    /// Returns the default size of [`Text`].
+    fn text_size(&self) -> Pixels {
+        self.settings().text_size
+    }
+
     /// Draws the given [`Paragraph`] at the given position and with the given
     /// [`Color`].
     fn fill_paragraph(

@@ -379,9 +379,7 @@ where
     ) -> layout::Node {
         use std::f32;
 
-        let text_size = self
-            .text_size
-            .unwrap_or_else(|| renderer.settings().text_size);
+        let text_size = self.text_size.unwrap_or_else(|| renderer.text_size());
 
         let text_line_height = self.line_height.to_absolute(text_size);
 
@@ -423,9 +421,7 @@ where
             }
             Event::Mouse(mouse::Event::CursorMoved { .. }) => {
                 if let Some(cursor_position) = cursor.position_in(layout.bounds()) {
-                    let text_size = self
-                        .text_size
-                        .unwrap_or_else(|| renderer.settings().text_size);
+                    let text_size = self.text_size.unwrap_or_else(|| renderer.text_size());
 
                     let option_height =
                         f32::from(self.line_height.to_absolute(text_size)) + self.padding.y();
@@ -447,9 +443,7 @@ where
             }
             Event::Touch(touch::Event::FingerPressed { .. }) => {
                 if let Some(cursor_position) = cursor.position_in(layout.bounds()) {
-                    let text_size = self
-                        .text_size
-                        .unwrap_or_else(|| renderer.settings().text_size);
+                    let text_size = self.text_size.unwrap_or_else(|| renderer.text_size());
 
                     let option_height =
                         f32::from(self.line_height.to_absolute(text_size)) + self.padding.y();
@@ -509,9 +503,7 @@ where
         let style = Catalog::style(theme, self.class);
         let bounds = layout.bounds();
 
-        let text_size = self
-            .text_size
-            .unwrap_or_else(|| renderer.settings().text_size);
+        let text_size = self.text_size.unwrap_or_else(|| renderer.text_size());
         let option_height = f32::from(self.line_height.to_absolute(text_size)) + self.padding.y();
 
         let offset = viewport.y - bounds.y;
@@ -555,9 +547,7 @@ where
                     bounds: Size::new(bounds.width - self.padding.x(), bounds.height),
                     size: text_size,
                     line_height: self.line_height,
-                    font: self
-                        .font
-                        .unwrap_or_else(|| renderer.settings().font),
+                    font: self.font.unwrap_or_else(|| renderer.font()),
                     align_x: text::Alignment::Default,
                     align_y: alignment::Vertical::Center,
                     shaping: self.shaping,

@@ -305,12 +305,8 @@ where
     layout::sized(limits, format.width, format.height, |limits| {
         let bounds = limits.max();
 
-        let size = format
-            .size
-            .unwrap_or_else(|| renderer.settings().text_size);
-        let font = format
-            .font
-            .unwrap_or_else(|| renderer.settings().font);
+        let size = format.size.unwrap_or_else(|| renderer.text_size());
+        let font = format.font.unwrap_or_else(|| renderer.font());
 
         let _ = paragraph.update(text::Text {
             content,

@@ -313,10 +313,7 @@ where
                 }
 
                 if span.underline || span.strikethrough || is_hovered_link {
-                    let size = span
-                        .size
-                        .or(self.size)
-                        .unwrap_or(renderer.settings().text_size);
+                    let size = span.size.or(self.size).unwrap_or(renderer.text_size());
 
                     let line_height = span
                         .line_height
@@ -484,8 +481,8 @@ where
     layout::sized(limits, width, height, |limits| {
         let bounds = limits.max();
 
-        let size = size.unwrap_or_else(|| renderer.settings().text_size);
-        let font = font.unwrap_or_else(|| renderer.settings().font);
+        let size = size.unwrap_or_else(|| renderer.text_size());
+        let font = font.unwrap_or_else(|| renderer.font());
 
         let text_with_spans = || core::Text {
             content: spans,
