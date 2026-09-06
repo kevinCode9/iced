@@ -551,10 +551,16 @@ pub fn with_executor<P: Program, E: Executor>(
 }
 
 /// The renderer of some [`Program`].
-pub trait Renderer: text::Renderer<Font = Font> + compositor::Default + renderer::Headless {}
+pub trait Renderer:
+    text::Renderer + crate::core::Renderer<Font = Font> + compositor::Default + renderer::Headless
+{
+}
 
 impl<T> Renderer for T where
-    T: text::Renderer<Font = Font> + compositor::Default + renderer::Headless
+    T: text::Renderer
+        + crate::core::Renderer<Font = Font>
+        + compositor::Default
+        + renderer::Headless
 {
 }
 

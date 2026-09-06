@@ -199,7 +199,7 @@ where
 
     /// Sets the [`Font`] of the [`TextInput`].
     ///
-    /// [`Font`]: text::Renderer::Font
+    /// [`Font`]: crate::core::Renderer::Font
     pub fn font(mut self, font: Renderer::Font) -> Self {
         self.font = Some(font);
         self

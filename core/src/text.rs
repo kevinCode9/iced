@@ -324,9 +324,6 @@ pub enum Difference {
 
 /// A renderer capable of measuring and drawing [`Text`].
 pub trait Renderer: crate::Renderer {
-    /// The font type used.
-    type Font: Copy + PartialEq;
-
     /// The [`Paragraph`] of this [`Renderer`].
     type Paragraph: Paragraph<Font = Self::Font> + 'static;
 
@@ -370,12 +367,6 @@ pub trait Renderer: crate::Renderer {
     ///
     /// ['ICON_FONT']: Self::ICON_FONT
     const ICED_LOGO: char;
-
-    /// Returns the default [`Self::Font`].
-    fn default_font(&self) -> Self::Font;
-
-    /// Returns the default size of [`Text`].
-    fn default_size(&self) -> Pixels;
 
     /// Draws the given [`Paragraph`] at the given position and with the given
     /// [`Color`].

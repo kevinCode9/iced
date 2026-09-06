@@ -27,7 +27,7 @@ pub use primitive::Primitive;
 pub use geometry::Geometry;
 
 use crate::core::renderer;
-use crate::core::{Background, Color, Font, Pixels, Point, Rectangle, Size, Transformation};
+use crate::core::{Background, Color, Font, Point, Rectangle, Size, Transformation};
 use crate::engine::Engine;
 use crate::graphics::Viewport;
 use crate::graphics::compositor;
@@ -187,6 +187,8 @@ impl Renderer {
 }
 
 impl core::Renderer for Renderer {
+    type Font = Font;
+
     fn start_layer(&mut self, bounds: Rectangle) {
         self.layers.push_clip(bounds);
     }
@@ -241,7 +243,6 @@ impl core::Renderer for Renderer {
 }
 
 impl core::text::Renderer for Renderer {
-    type Font = Font;
     type Paragraph = Paragraph;
     type Editor = Editor;
 
@@ -253,14 +254,6 @@ impl core::text::Renderer for Renderer {
     const SCROLL_DOWN_ICON: char = '\u{e803}';
     const SCROLL_LEFT_ICON: char = '\u{e804}';
     const SCROLL_RIGHT_ICON: char = '\u{e805}';
-
-    fn default_font(&self) -> Self::Font {
-        self.settings.default_font
-    }
-
-    fn default_size(&self) -> Pixels {
-        self.settings.default_text_size
-    }
 
     fn fill_paragraph(
         &mut self,

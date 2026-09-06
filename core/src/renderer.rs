@@ -3,9 +3,7 @@
 mod null;
 
 use crate::image;
-use crate::{
-    Background, Border, Color, Font, Pixels, Rectangle, Shadow, Size, Transformation, Vector,
-};
+use crate::{Background, Border, Color, Pixels, Rectangle, Shadow, Size, Transformation, Vector};
 
 /// Whether anti-aliasing should be avoided by snapping primitive coordinates to the
 /// pixel grid.
@@ -13,6 +11,9 @@ pub const CRISP: bool = cfg!(feature = "crisp");
 
 /// A component that can be used by widgets to draw themselves on a screen.
 pub trait Renderer {
+    /// The font type used.
+    type Font: Copy + PartialEq;
+
     /// Starts recording a new layer.
     fn start_layer(&mut self, bounds: Rectangle);
 
@@ -87,7 +88,7 @@ pub trait Renderer {
     fn reset(&mut self, new_bounds: Rectangle);
 
     /// Returns the [`Settings`] of this [`Renderer`].
-    fn settings(&self) -> Settings;
+    fn settings(&self) -> Settings<Self::Font>;
 
     /// Polls any concurrent computations that may be pending in the [`Renderer`].
     ///
@@ -163,8 +164,8 @@ pub trait Headless {
 
 /// The settings of a [`Renderer`].
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Settings {
-    /// The default [`Font`] to use.
+pub struct Settings<Font = crate::Font> {
+    /// The default font to use.
     pub default_font: Font,
 
     /// The default size of text.
@@ -181,7 +182,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            default_font: Font::DEFAULT,
+            default_font: crate::Font::DEFAULT,
             default_text_size: Pixels(16.0),
             metrics_hinting: true,
         }

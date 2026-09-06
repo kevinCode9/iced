@@ -92,7 +92,7 @@ where
 
     /// Sets the [`Font`] of the [`Text`].
     ///
-    /// [`Font`]: crate::text::Renderer::Font
+    /// [`Font`]: crate::Renderer::Font
     pub fn font(mut self, font: impl Into<Renderer::Font>) -> Self {
         self.format.font = Some(font.into());
         self
@@ -100,7 +100,7 @@ where
 
     /// Sets the [`Font`] of the [`Text`], if `Some`.
     ///
-    /// [`Font`]: crate::text::Renderer::Font
+    /// [`Font`]: crate::Renderer::Font
     pub fn font_maybe(mut self, font: Option<impl Into<Renderer::Font>>) -> Self {
         self.format.font = font.map(Into::into);
         self
@@ -311,8 +311,12 @@ where
     layout::sized(limits, format.width, format.height, |limits| {
         let bounds = limits.max();
 
-        let size = format.size.unwrap_or_else(|| renderer.default_size());
-        let font = format.font.unwrap_or_else(|| renderer.default_font());
+        let size = format
+            .size
+            .unwrap_or_else(|| renderer.settings().default_text_size);
+        let font = format
+            .font
+            .unwrap_or_else(|| renderer.settings().default_font);
 
         let _ = paragraph.update(text::Text {
             content,

@@ -7,6 +7,8 @@ use crate::text::{self, Text};
 use crate::{Background, Color, Font, Pixels, Point, Rectangle, Size, Transformation};
 
 impl Renderer for () {
+    type Font = Font;
+
     fn start_layer(&mut self, _bounds: Rectangle) {}
 
     fn end_layer(&mut self) {}
@@ -40,7 +42,6 @@ impl Renderer for () {
 }
 
 impl text::Renderer for () {
-    type Font = Font;
     type Paragraph = ();
     type Editor = ();
 
@@ -52,14 +53,6 @@ impl text::Renderer for () {
     const SCROLL_LEFT_ICON: char = '0';
     const SCROLL_RIGHT_ICON: char = '0';
     const ICED_LOGO: char = '0';
-
-    fn default_font(&self) -> Self::Font {
-        Font::default()
-    }
-
-    fn default_size(&self) -> Pixels {
-        Pixels(16.0)
-    }
 
     fn fill_paragraph(
         &mut self,

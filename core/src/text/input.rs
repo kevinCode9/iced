@@ -84,8 +84,12 @@ impl<R: text::Renderer> Input<R> {
             .height(layout.height)
             .shrink(layout.padding);
 
-        let font = layout.font.unwrap_or_else(|| renderer.default_font());
-        let size = layout.size.unwrap_or_else(|| renderer.default_size());
+        let font = layout
+            .font
+            .unwrap_or_else(|| renderer.settings().default_font);
+        let size = layout
+            .size
+            .unwrap_or_else(|| renderer.settings().default_text_size);
         let hint_factor = renderer.hint_factor();
 
         if layout.is_secure {

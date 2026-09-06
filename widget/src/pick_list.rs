@@ -356,8 +356,12 @@ where
     ) -> layout::Node {
         let state = tree.state.downcast_mut::<State<Renderer::Paragraph>>();
 
-        let font = self.font.unwrap_or_else(|| renderer.default_font());
-        let text_size = self.text_size.unwrap_or_else(|| renderer.default_size());
+        let font = self
+            .font
+            .unwrap_or_else(|| renderer.settings().default_font);
+        let text_size = self
+            .text_size
+            .unwrap_or_else(|| renderer.settings().default_text_size);
         let options = self.options.borrow();
 
         let option_text = Text {
@@ -577,7 +581,9 @@ where
         _cursor: mouse::Cursor,
         viewport: &Rectangle,
     ) {
-        let font = self.font.unwrap_or_else(|| renderer.default_font());
+        let font = self
+            .font
+            .unwrap_or_else(|| renderer.settings().default_font);
         let selected = self.selected.as_ref().map(Borrow::borrow);
         let state = tree.state.downcast_ref::<State<Renderer::Paragraph>>();
 
@@ -636,7 +642,7 @@ where
         };
 
         if let Some((font, code_point, size, line_height, shaping)) = handle {
-            let size = size.unwrap_or_else(|| renderer.default_size());
+            let size = size.unwrap_or_else(|| renderer.settings().default_text_size);
 
             renderer.fill_text(
                 Text {
@@ -664,7 +670,9 @@ where
         let label = selected.map(&self.to_string);
 
         if let Some(label) = label.or_else(|| self.placeholder.clone()) {
-            let text_size = self.text_size.unwrap_or_else(|| renderer.default_size());
+            let text_size = self
+                .text_size
+                .unwrap_or_else(|| renderer.settings().default_text_size);
 
             renderer.fill_text(
                 Text {
@@ -707,7 +715,9 @@ where
         };
 
         let state = tree.state.downcast_mut::<State<Renderer::Paragraph>>();
-        let font = self.font.unwrap_or_else(|| renderer.default_font());
+        let font = self
+            .font
+            .unwrap_or_else(|| renderer.settings().default_font);
 
         if state.is_open {
             let bounds = layout.bounds();
