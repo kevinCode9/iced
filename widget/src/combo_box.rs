@@ -66,7 +66,9 @@ use crate::core::text::input;
 use crate::core::widget::operation::Focusable as _;
 use crate::core::widget::{self, Widget};
 use crate::core::window;
-use crate::core::{Element, Event, Length, Padding, Pixels, Rectangle, Shell, Size, Theme, Vector};
+use crate::core::{
+    Element, Event, Font, Length, Padding, Pixels, Rectangle, Shell, Size, Theme, Vector,
+};
 use crate::overlay::menu;
 use crate::text::LineHeight;
 use crate::text_input;
@@ -130,10 +132,9 @@ use std::sync::atomic::{self, AtomicU64};
 ///     }
 /// }
 /// ```
-pub struct ComboBox<'a, T, Message, Theme = crate::Theme, Renderer = crate::Renderer>
+pub struct ComboBox<'a, T, Message, Theme = crate::Theme>
 where
     Theme: Catalog,
-    Renderer: text::Renderer,
 {
     state: &'a State<T>,
     id: Option<widget::Id>,
@@ -141,7 +142,7 @@ where
     selection: String,
     width: Length,
     line_height: LineHeight,
-    font: Option<Renderer::Font>,
+    font: Option<Font>,
     on_selected: Box<dyn Fn(T) -> Message + 'a>,
     on_option_hovered: Option<Box<dyn Fn(T) -> Message + 'a>>,
     on_open: Option<Message>,
@@ -157,11 +158,10 @@ where
     last_status: Option<text_input::Status>,
 }
 
-impl<'a, T, Message, Theme, Renderer> ComboBox<'a, T, Message, Theme, Renderer>
+impl<'a, T, Message, Theme> ComboBox<'a, T, Message, Theme>
 where
     T: std::fmt::Display + Clone,
     Theme: Catalog,
-    Renderer: text::Renderer,
 {
     /// Creates a new [`ComboBox`] with the given list of options, a placeholder,
     /// the current selected value, and the message to produce when an option is
@@ -236,10 +236,10 @@ where
         self
     }
 
-    /// Sets the [`Renderer::Font`] of the [`ComboBox`].
+    /// Sets the [`Font`] of the [`ComboBox`].
     ///
-    /// [`Renderer::Font`]: text::Renderer
-    pub fn font(mut self, font: Renderer::Font) -> Self {
+    /// [`Font`]: crate::core::Font
+    pub fn font(mut self, font: Font) -> Self {
         self.font = Some(font);
         self
     }
@@ -403,7 +403,7 @@ struct Editor<R: text::Renderer> {
 }
 
 impl<T, Message, Theme, Renderer> Widget<Message, Theme, Renderer>
-    for ComboBox<'_, T, Message, Theme, Renderer>
+    for ComboBox<'_, T, Message, Theme>
 where
     T: Display + Clone + 'static,
     Message: Clone,
@@ -769,7 +769,7 @@ where
     }
 }
 
-impl<'a, T, Message, Theme, Renderer> From<ComboBox<'a, T, Message, Theme, Renderer>>
+impl<'a, T, Message, Theme, Renderer> From<ComboBox<'a, T, Message, Theme>>
     for Element<'a, Message, Theme, Renderer>
 where
     T: Display + Clone + 'static,
@@ -777,7 +777,7 @@ where
     Theme: Catalog + 'a,
     Renderer: text::Renderer + 'static,
 {
-    fn from(combo_box: ComboBox<'a, T, Message, Theme, Renderer>) -> Self {
+    fn from(combo_box: ComboBox<'a, T, Message, Theme>) -> Self {
         Self::new(combo_box)
     }
 }

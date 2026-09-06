@@ -82,8 +82,6 @@ impl Editor {
 }
 
 impl editor::Editor for Editor {
-    type Font = Font;
-
     fn with_text(text: &str) -> Self {
         let mut buffer = cosmic_text::Buffer::new_empty(cosmic_text::Metrics {
             font_size: 1.0,
@@ -799,7 +797,7 @@ impl editor::Editor for Editor {
 
     fn highlight<P: Parser>(
         &mut self,
-        font: Self::Font,
+        font: Font,
         parser: &mut P,
         highlight: impl Fn(P::Output) -> highlighter::Style,
     ) {
@@ -893,7 +891,7 @@ impl editor::Editor for Editor {
         ))
     }
 
-    fn font(&self) -> Self::Font {
+    fn font(&self) -> Font {
         self.internal().font
     }
 }

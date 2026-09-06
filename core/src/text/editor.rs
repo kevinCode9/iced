@@ -10,16 +10,15 @@ use crate::text::{self, Alignment, LineHeight, Position, Wrapping};
 use crate::time::{Duration, Instant};
 use crate::widget::operation::{Focusable, TextInput};
 use crate::window;
-use crate::{Color, Event, InputMethod, Padding, Pixels, Point, Rectangle, Size, SmolStr, Vector};
+use crate::{
+    Color, Event, Font, InputMethod, Padding, Pixels, Point, Rectangle, Size, SmolStr, Vector,
+};
 
 use std::borrow::Cow;
 use std::sync::Arc;
 
 /// A component that can be used by widgets to edit multi-line text.
 pub trait Editor: Sized + Default {
-    /// The font of the [`Editor`].
-    type Font: Copy + PartialEq + Default;
-
     /// Creates a new [`Editor`] laid out with the given text.
     fn with_text(text: &str) -> Self;
 
@@ -61,7 +60,7 @@ pub trait Editor: Sized + Default {
     fn update(
         &mut self,
         new_bounds: Size,
-        new_font: Self::Font,
+        new_font: Font,
         new_size: Pixels,
         new_line_height: LineHeight,
         new_wrapping: Wrapping,
@@ -76,7 +75,7 @@ pub trait Editor: Sized + Default {
     /// Runs a [`text::Highlighter`] in the [`Editor`].
     fn highlight<P: text::Parser>(
         &mut self,
-        font: Self::Font,
+        font: Font,
         parser: &mut P,
         highlight: impl Fn(P::Output) -> highlighter::Style,
     );
@@ -109,8 +108,8 @@ pub trait Editor: Sized + Default {
         contents
     }
 
-    /// Returns the current [`Font`](Self::Font) of the [`Editor`].
-    fn font(&self) -> Self::Font;
+    /// Returns the current [`Font`] of the [`Editor`].
+    fn font(&self) -> Font;
 
     /// Returns the current text size of the [`Editor`].
     fn text_size(&self) -> Pixels;

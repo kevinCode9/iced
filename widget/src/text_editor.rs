@@ -45,8 +45,8 @@ use crate::core::theme;
 use crate::core::widget::{self, Widget};
 use crate::core::window;
 use crate::core::{
-    Background, Border, Color, Element, Event, Length, Padding, Pixels, Rectangle, Shell, Size,
-    Theme,
+    Background, Border, Color, Element, Event, Font, Length, Padding, Pixels, Rectangle, Shell,
+    Size, Theme,
 };
 
 use std::borrow::Cow;
@@ -101,7 +101,7 @@ where
     id: Option<widget::Id>,
     content: &'a Content<Renderer>,
     placeholder: Option<text::Fragment<'a>>,
-    font: Option<Renderer::Font>,
+    font: Option<Font>,
     text_size: Option<Pixels>,
     line_height: LineHeight,
     width: Length,
@@ -175,7 +175,7 @@ where
         syntax: &str,
     ) -> TextEditor<'a, iced_highlighter::Parser, Message, crate::Theme, Renderer>
     where
-        Renderer: text::Renderer + crate::core::Renderer<Font = crate::core::Font>,
+        Renderer: text::Renderer,
     {
         self.highlight_with(
             iced_highlighter::Settings {
@@ -227,8 +227,8 @@ where
 
     /// Sets the [`Font`] of the [`TextEditor`].
     ///
-    /// [`Font`]: crate::core::Renderer::Font
-    pub fn font(mut self, font: impl Into<Renderer::Font>) -> Self {
+    /// [`Font`]: crate::core::Font
+    pub fn font(mut self, font: impl Into<Font>) -> Self {
         self.font = Some(font.into());
         self
     }

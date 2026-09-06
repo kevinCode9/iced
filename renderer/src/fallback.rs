@@ -36,10 +36,8 @@ macro_rules! delegate {
 impl<A, B> core::Renderer for Renderer<A, B>
 where
     A: core::Renderer,
-    B: core::Renderer<Font = A::Font>,
+    B: core::Renderer,
 {
-    type Font = A::Font;
-
     fn fill_quad(&mut self, quad: renderer::Quad, background: impl Into<Background>) {
         delegate!(self, renderer, renderer.fill_quad(quad, background.into()));
     }
@@ -88,7 +86,7 @@ where
         delegate!(self, renderer, renderer.reset(new_bounds));
     }
 
-    fn settings(&self) -> renderer::Settings<Self::Font> {
+    fn settings(&self) -> renderer::Settings {
         delegate!(self, renderer, renderer.settings())
     }
 }
@@ -96,13 +94,12 @@ where
 impl<A, B> core::text::Renderer for Renderer<A, B>
 where
     A: core::text::Renderer,
-    B: core::text::Renderer<Paragraph = A::Paragraph, Editor = A::Editor>
-        + core::Renderer<Font = A::Font>,
+    B: core::text::Renderer<Paragraph = A::Paragraph, Editor = A::Editor>,
 {
     type Paragraph = A::Paragraph;
     type Editor = A::Editor;
 
-    const ICON_FONT: Self::Font = A::ICON_FONT;
+    const ICON_FONT: core::Font = A::ICON_FONT;
     const CHECKMARK_ICON: char = A::CHECKMARK_ICON;
     const ARROW_DOWN_ICON: char = A::ARROW_DOWN_ICON;
     const SCROLL_UP_ICON: char = A::SCROLL_UP_ICON;
@@ -141,7 +138,7 @@ where
 
     fn fill_text(
         &mut self,
-        text: core::Text<String, Self::Font>,
+        text: core::Text<String>,
         position: Point,
         color: Color,
         clip_bounds: Rectangle,
@@ -167,7 +164,7 @@ where
 impl<A, B> image::Renderer for Renderer<A, B>
 where
     A: image::Renderer,
-    B: image::Renderer<Handle = A::Handle> + core::Renderer<Font = A::Font>,
+    B: image::Renderer<Handle = A::Handle>,
 {
     type Handle = A::Handle;
 
@@ -191,7 +188,7 @@ where
 impl<A, B> svg::Renderer for Renderer<A, B>
 where
     A: svg::Renderer,
-    B: svg::Renderer + core::Renderer<Font = A::Font>,
+    B: svg::Renderer,
 {
     fn measure_svg(&self, handle: &svg::Handle) -> Size<u32> {
         delegate!(self, renderer, renderer.measure_svg(handle))
@@ -393,7 +390,7 @@ where
 impl<A, B> iced_wgpu::primitive::Renderer for Renderer<A, B>
 where
     A: iced_wgpu::primitive::Renderer,
-    B: core::Renderer<Font = A::Font>,
+    B: core::Renderer,
 {
     fn draw_primitive(&mut self, bounds: Rectangle, primitive: impl iced_wgpu::Primitive) {
         match self {
@@ -417,7 +414,7 @@ mod geometry {
     impl<A, B> geometry::Renderer for Renderer<A, B>
     where
         A: geometry::Renderer,
-        B: geometry::Renderer + crate::core::Renderer<Font = A::Font>,
+        B: geometry::Renderer,
     {
         type Geometry = Geometry<A::Geometry, B::Geometry>;
         type Frame = Frame<A::Frame, B::Frame>;

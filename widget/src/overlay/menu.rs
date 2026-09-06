@@ -10,17 +10,16 @@ use crate::core::touch;
 use crate::core::widget::tree::{self, Tree};
 use crate::core::window;
 use crate::core::{
-    Background, Color, Event, Length, Padding, Pixels, Point, Rectangle, Shadow, Size, Theme,
+    Background, Color, Event, Font, Length, Padding, Pixels, Point, Rectangle, Shadow, Size, Theme,
     Vector,
 };
 use crate::core::{Element, Shell, Widget};
 use crate::scrollable::{self, Scrollable};
 
 /// A list of selectable options.
-pub struct Menu<'a, 'b, T, Message, Theme = crate::Theme, Renderer = crate::Renderer>
+pub struct Menu<'a, 'b, T, Message, Theme = crate::Theme>
 where
     Theme: Catalog,
-    Renderer: text::Renderer,
     'b: 'a,
 {
     state: &'a mut State,
@@ -35,16 +34,15 @@ where
     line_height: text::LineHeight,
     shaping: text::Shaping,
     ellipsis: text::Ellipsis,
-    font: Option<Renderer::Font>,
+    font: Option<Font>,
     class: &'a <Theme as Catalog>::Class<'b>,
 }
 
-impl<'a, 'b, T, Message, Theme, Renderer> Menu<'a, 'b, T, Message, Theme, Renderer>
+impl<'a, 'b, T, Message, Theme> Menu<'a, 'b, T, Message, Theme>
 where
     T: Clone,
     Message: 'a,
     Theme: Catalog + 'a,
-    Renderer: text::Renderer + 'a,
     'b: 'a,
 {
     /// Creates a new [`Menu`] with the given [`State`], a list of options,
@@ -113,7 +111,7 @@ where
     }
 
     /// Sets the font of the [`Menu`].
-    pub fn font(mut self, font: impl Into<Renderer::Font>) -> Self {
+    pub fn font(mut self, font: impl Into<Font>) -> Self {
         self.font = Some(font.into());
         self
     }
@@ -124,13 +122,16 @@ where
     /// The `target_height` will be used to display the menu either on top
     /// of the target or under it, depending on the screen position and the
     /// dimensions of the [`Menu`].
-    pub fn overlay(
+    pub fn overlay<Renderer>(
         self,
         position: Point,
         viewport: Rectangle,
         target_height: f32,
         menu_height: Length,
-    ) -> overlay::Element<'a, Message, Theme, Renderer> {
+    ) -> overlay::Element<'a, Message, Theme, Renderer>
+    where
+        Renderer: text::Renderer + 'a,
+    {
         overlay::Element::new(Box::new(Overlay::new(
             position,
             viewport,
@@ -186,7 +187,7 @@ where
     pub fn new<T>(
         position: Point,
         viewport: Rectangle,
-        menu: Menu<'a, 'b, T, Message, Theme, Renderer>,
+        menu: Menu<'a, 'b, T, Message, Theme>,
         target_height: f32,
         menu_height: Length,
     ) -> Self
@@ -208,6 +209,7 @@ where
             shaping,
             ellipsis,
             class,
+            ..
         } = menu;
 
         let mut list = Scrollable::new(List {
@@ -325,10 +327,9 @@ where
     }
 }
 
-struct List<'a, 'b, T, Message, Theme, Renderer>
+struct List<'a, 'b, T, Message, Theme>
 where
     Theme: Catalog,
-    Renderer: text::Renderer,
 {
     options: &'a [T],
     hovered_option: &'a mut Option<usize>,
@@ -340,7 +341,7 @@ where
     line_height: text::LineHeight,
     shaping: text::Shaping,
     ellipsis: text::Ellipsis,
-    font: Option<Renderer::Font>,
+    font: Option<Font>,
     class: &'a <Theme as Catalog>::Class<'b>,
 }
 
@@ -349,7 +350,7 @@ struct ListState {
 }
 
 impl<T, Message, Theme, Renderer> Widget<Message, Theme, Renderer>
-    for List<'_, '_, T, Message, Theme, Renderer>
+    for List<'_, '_, T, Message, Theme>
 where
     T: Clone,
     Theme: Catalog,
@@ -576,7 +577,7 @@ where
     }
 }
 
-impl<'a, 'b, T, Message, Theme, Renderer> From<List<'a, 'b, T, Message, Theme, Renderer>>
+impl<'a, 'b, T, Message, Theme, Renderer> From<List<'a, 'b, T, Message, Theme>>
     for Element<'a, Message, Theme, Renderer>
 where
     T: Clone,
@@ -585,7 +586,7 @@ where
     Renderer: 'a + text::Renderer,
     'b: 'a,
 {
-    fn from(list: List<'a, 'b, T, Message, Theme, Renderer>) -> Self {
+    fn from(list: List<'a, 'b, T, Message, Theme>) -> Self {
         Element::new(list)
     }
 }

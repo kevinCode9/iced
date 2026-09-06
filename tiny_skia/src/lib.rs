@@ -187,8 +187,6 @@ impl Renderer {
 }
 
 impl core::Renderer for Renderer {
-    type Font = Font;
-
     fn start_layer(&mut self, bounds: Rectangle) {
         self.layers.push_clip(bounds);
     }

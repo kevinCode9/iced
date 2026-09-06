@@ -311,7 +311,7 @@ where
 {
     position: Point,
     content: Renderer::Paragraph,
-    spans: Vec<text::Span<'static, (), Renderer::Font>>,
+    spans: Vec<text::Span<'static, ()>>,
 }
 
 impl<Renderer> Preedit<Renderer>

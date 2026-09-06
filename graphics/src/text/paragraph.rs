@@ -61,8 +61,6 @@ impl Paragraph {
 }
 
 impl core::text::Paragraph for Paragraph {
-    type Font = Font;
-
     fn with_text(text: Text<&str>) -> Self {
         log::trace!("Allocating plain paragraph: {}", text.content);
 
