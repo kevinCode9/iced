@@ -2419,7 +2419,11 @@ mod code {
 
         pub fn parse_line(&mut self, text: &str) -> &[Span] {
             match self.lines.get(self.current) {
-                Some(line) if line.0 == text => {}
+                Some(line) if line.0 == text => {
+                    if self.current + 1 == self.lines.len() {
+                        self.stream.commit();
+                    }
+                }
                 _ => {
                     if self.current + 1 < self.lines.len() {
                         log::debug!("Resetting highlighter...");
@@ -2430,16 +2434,17 @@ mod code {
                             log::debug!("Refeeding {n} lines", n = self.lines.len());
 
                             let _ = self.stream.parse_line(&line.0);
+                            self.stream.commit();
                         }
                     }
 
                     log::trace!("Parsing: {text}", text = text.trim_end());
 
-                    if self.current + 1 < self.lines.len() {
+                    let mut spans = Vec::new();
+
+                    if self.current == self.lines.len() {
                         self.stream.commit();
                     }
-
-                    let mut spans = Vec::new();
 
                     for (range, code) in self.stream.parse_line(text) {
                         spans.push(Span::Code {
@@ -2448,11 +2453,11 @@ mod code {
                         });
                     }
 
-                    if self.current + 1 == self.lines.len() {
-                        let _ = self.lines.pop();
+                    if self.current == self.lines.len() {
+                        self.lines.push((text.to_owned(), spans));
+                    } else {
+                        self.lines[self.current] = (text.to_owned(), spans);
                     }
-
-                    self.lines.push((text.to_owned(), spans));
                 }
             }
 
