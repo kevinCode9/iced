@@ -277,13 +277,15 @@ where
                             Control::ChangeFlow(flow) => {
                                 use winit::event_loop::ControlFlow;
 
+                                let now = Instant::now();
+
                                 match (event_loop.control_flow(), flow) {
                                     (
                                         ControlFlow::WaitUntil(current),
                                         ControlFlow::WaitUntil(new),
-                                    ) if current < new => {}
-                                    (ControlFlow::WaitUntil(target), ControlFlow::Wait)
-                                        if target > Instant::now() => {}
+                                    ) if current > now && current < new => {}
+                                    (ControlFlow::WaitUntil(current), ControlFlow::Wait)
+                                        if current > now => {}
                                     _ => {
                                         event_loop.set_control_flow(flow);
                                     }
